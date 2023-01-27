@@ -1,0 +1,29 @@
+{
+    "name": "vzool/dove.php",
+    "description": "Dove Notification File System (DNFS)",
+    "keywords": [
+        "notifications",
+        "notification-api",
+        "notification-service",
+        "notification", 
+        "notification-system"
+    ],
+    "homepage": "https://github.com/vzool/dove.php",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Abdelaziz Elrashed",
+            "email": "aeemh.sdn@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.3"
+    },
+    "scripts": {
+        "test": "php dove.php"
+    },
+    "scripts-descriptions": {
+        "test": "Run all tests!"
+    }
+}

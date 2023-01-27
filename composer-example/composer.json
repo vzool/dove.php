@@ -1,0 +1,11 @@
+{
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../"
+        }
+    ],
+    "require": {
+        "vzool/dove.php": "dev-main"
+    }
+}
