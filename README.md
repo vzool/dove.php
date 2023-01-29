@@ -40,6 +40,10 @@ Yes, one single file has them all, `dove.php` file contains the implementation, 
 
 In fact, Dove is a special library which you can use the single file `dove.php`, or install it via composer without any namespaces is required. Both of these methods will make you use the full functions of the libarary.
 
+**Dove Storge Data Structure**
+
+![dove-storage-system](images/dove-storage-system.png)
+
 ### :office: Requirements
 
 - PHP 7.3+ (older versions will be supported one by one in the future).
@@ -144,6 +148,7 @@ Average Speed 55303.444444444 (msg/sec).
 ====================================================
 ```
 
+You can run your own benchmarks on your PC with the following command `php benchmark.php`
 ### :microscope: Test
 
 It should work without any issues, otherwise, an exception will be thrown. 
