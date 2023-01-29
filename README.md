@@ -24,14 +24,14 @@ $dove = new Dove(
 
 Dove doesn't process the sent or received data in any way like encryption or encoding, so it is just act like a bridge to transfer data from server to clients. If you have some conserns like binary data just endcode them by using `base64` and to maintain the privacy use encryption, all that were left to the developer choices.
 
-"**Expiration of Messages**" is temporary stored in request memory when a new instance of `Dove` object is created, by default its value is zero which means disabled, otherwise it will be in days. If expiration is disabled the DNFS will store all the messages without delete any. So, delete operation after expiration is calculated and old messages removed when `Pull` call is peformed on a specific client.
+"**Expiration of Messages**" is temporary stored in request memory when a new instance of `Dove` object is created, by default its value is zero which means disabled, otherwise it will be in days. If expiration is disabled the DNFS will store all the messages without delete any. So, the delete operation after expiration is calculated and old messages are removed when a `Pull` call is performed with a specific client.
 
-DNFS is a lazy actor which it is not require any scheduled job to be active in order do its job, it is only waiting for client action to update its messages status.
+DNFS is a lazy actor which it does not require any scheduled job to be active in order to do its job, it is only waiting for client action to update the status of the message.
 
 ### :sparkles: Motivation
 The main idea came from the [Passky-Server](https://github.com/Rabbit-Company/Passky-Server) project chats on the [discord server](https://discord.gg/y2ZBKbW5TA) about what happened to LastPass data breach, which affects Personally Identifiable Information (PII) and lets a bad actor uses that information to stage a Phishing-Attack.
-There were many ideas shared, one of them was [Zica Zajc](https://github.com/zigazajc007) who is a great man and the CEO of Passky project, he suggested that the server can store the messages and the clients will check for them later.
-So, I thought it will be better for everyone to consildate this idea into a usable library.
+There were many ideas shared, one of them was [Zica Zajc](https://github.com/zigazajc007) who is a great man and the CEO of Passky project, he suggested that the server can store the messages and the clients will check them later.
+So, I thought it will be a better for everyone to consildate this idea into a usable library.
 ### :eyes: Anatomy
 
 Dove is a very small library which it is less than 100 LOC (lines of code), and the core implementaion took only 48%, 17% for HTTP handling and the rest is for testing.
@@ -40,7 +40,7 @@ Yes, one single file has them all, `dove.php` file contains the implementation, 
 
 In fact, Dove is a special library which you can use the single file `dove.php`, or install it via composer without any namespaces is required. Both of these methods will make you use the full functions of the libarary.
 
-**Dove Storage Data Structure**
+**Dove Storage Data Structure (DSDS)**
 
 ![dove-storage-system](images/dove-storage-system.png)
 
@@ -123,28 +123,28 @@ Then, to handle client requests only include this in path of `$_REQUEST` and it 
 - OS: masOS Ventura 13.1
 ```shell
 ====================================================
-Dove Benchmarking started at: 2023-01-29 12:22:36
+Dove Benchmarking started at: 2023-01-29 12:33:34
 ====================================================
 Write messages for 30 sec...
-Write finished on: 2023-01-29 12:23:07
+Write finished on: 2023-01-29 12:34:05
 ----------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-29 12:23:12
+Read finished on: 2023-01-29 12:34:09
 ----------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-29 12:23:29
+Delete finished on: 2023-01-29 12:34:28
 ====================================================
-Write Count 181219 (msg) in 30 sec
-Write Speed 6,040.63 (msg/sec).
+Write Count 173,106 (msg) in 30 sec
+Write Speed 5,770 (msg/sec).
 ----------------------------------------------------
-Read Count 181219 (msg) in 5 sec
-Read Speed 36,243.80 (msg/sec).
+Read Count 173,106 (msg) in 4 sec
+Read Speed 43,277 (msg/sec).
 ----------------------------------------------------
-Delete Count 181219 (msg) in 17 sec
-Delete Speed 10,659.94 (msg/sec).
+Delete Count 173,106 (msg) in 19 sec
+Delete Speed 9,111 (msg/sec).
 ----------------------------------------------------
-Average Count 543657 (msg).
-Average Speed 52,944.37 (msg/sec).
+Average Count 519,318 (msg).
+Average Speed 58,158 (msg/sec).
 ====================================================
 ```
 
