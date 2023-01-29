@@ -61,7 +61,12 @@ $delete_speed = $delete / ($delete_duration);
 $average = ($write + $read + $delete);
 $average_speed = ($write_speed + $read_speed + $delete_speed);
 
-echo "Write Count $write (msg)" . PHP_EOL;
+$write_speed = number_format($write_speed, 2);
+$read_speed = number_format($read_speed, 2);
+$delete_speed = number_format($delete_speed, 2);
+$average_speed = number_format($average_speed, 2);
+
+echo "Write Count $write (msg) in $write_duration sec" . PHP_EOL;
 echo "Write Speed $write_speed (msg/sec)." . PHP_EOL;
 echo "----------------------------------------------------" . PHP_EOL;
 echo "Read Count $read (msg) in $read_duration sec" . PHP_EOL;

@@ -40,7 +40,7 @@ Yes, one single file has them all, `dove.php` file contains the implementation, 
 
 In fact, Dove is a special library which you can use the single file `dove.php`, or install it via composer without any namespaces is required. Both of these methods will make you use the full functions of the libarary.
 
-**Dove Storge Data Structure**
+**Dove Storage Data Structure**
 
 ![dove-storage-system](images/dove-storage-system.png)
 
@@ -123,28 +123,28 @@ Then, to handle client requests only include this in path of `$_REQUEST` and it 
 - OS: masOS Ventura 13.1
 ```shell
 ====================================================
-Dove Benchmarking started at: 2023-01-29 07:36:22
+Dove Benchmarking started at: 2023-01-29 12:22:36
 ====================================================
 Write messages for 30 sec...
-Write finished on: 2023-01-29 07:36:53
+Write finished on: 2023-01-29 12:23:07
 ----------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-29 07:36:58
+Read finished on: 2023-01-29 12:23:12
 ----------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-29 07:37:16
+Delete finished on: 2023-01-29 12:23:29
 ====================================================
-Write Count 191435 (msg)
-Write Speed 6381.1666666667 (msg/sec).
+Write Count 181219 (msg) in 30 sec
+Write Speed 6,040.63 (msg/sec).
 ----------------------------------------------------
-Read Count 191435 (msg) in 5 sec
-Read Speed 38287 (msg/sec).
+Read Count 181219 (msg) in 5 sec
+Read Speed 36,243.80 (msg/sec).
 ----------------------------------------------------
-Delete Count 191435 (msg) in 18 sec
-Delete Speed 10635.277777778 (msg/sec).
+Delete Count 181219 (msg) in 17 sec
+Delete Speed 10,659.94 (msg/sec).
 ----------------------------------------------------
-Average Count 574305 (msg).
-Average Speed 55303.444444444 (msg/sec).
+Average Count 543657 (msg).
+Average Speed 52,944.37 (msg/sec).
 ====================================================
 ```
 
