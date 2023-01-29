@@ -44,6 +44,8 @@ In fact, Dove is a special library which you can use the single file `dove.php`,
 
 ![dove-storage-system](images/dove-storage-system.png)
 
+The `.dove` directory can be in a public path with a directory listing feature if it does support by the web server, but you can also put it in a private location and DNFS will be the only access point to those data.
+
 ### :office: Requirements
 
 - PHP 7.3+ (older versions will be supported one by one in the future).
