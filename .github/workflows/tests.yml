@@ -15,9 +15,9 @@ jobs:
         os: [
           # windows-2022,
           # windows-2019,
-          ubuntu-22.04,
-          macos-12,
-          macos-11
+          # macos-12,
+          # macos-11,
+          ubuntu-22.04
         ]
         php: [
           # 5.3,

@@ -146,6 +146,8 @@ Average Speed 55303.444444444 (msg/sec).
 
 ### :microscope: Test
 
+It should work without any issues, otherwise, an exception will be thrown. 
+
 ```bash
 php dove.php
 # OR
