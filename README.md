@@ -1,5 +1,12 @@
 # :bird: Dove Notification File System (DNFS)
 
+<p>
+<a href="https://github.com/vzool/dove.php/actions"><img src="https://github.com/vzool/dove.php/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://packagist.org/packages/vzool/dove.php"><img src="https://img.shields.io/packagist/dt/vzool/dove.php" alt="Total Downloads"></a>
+<a href="https://packagist.org/packages/vzool/dove.php"><img src="https://img.shields.io/packagist/v/vzool/dove.php" alt="Latest Stable Version"></a>
+<a href="https://packagist.org/packages/vzool/dove.php"><img src="https://img.shields.io/packagist/l/vzool/dove.php" alt="License"></a>
+</p>
+
 Dove is a notification system based on the file storage system to deliver the messages, it is working as one-direction stream of data from server to the clients.
 So, the server just put the messages and later the clients will check for any updates on their own schedules.
 

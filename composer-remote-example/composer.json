@@ -1,0 +1,5 @@
+{
+    "require": {
+        "vzool/dove.php": "^1.0"
+    }
+}
