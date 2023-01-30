@@ -34,7 +34,7 @@ There were many ideas shared, one of them was [Zica Zajc](https://github.com/zig
 So, I thought it will be a better for everyone to consildate this idea into a usable library.
 ### :eyes: Anatomy
 
-Dove is a very small library which it is less than 100 LOC (lines of code), and the core implementaion took only 48%, 17% for HTTP handling and the rest is for testing.
+Dove is a very small library which it is less than 120 LOC (lines of code), and the core implementaion took only 51%, 14% for HTTP handling and the rest is for testing.
 
 Yes, one single file has them all, `dove.php` file contains the implementation, HTTP router and testing, isn't this great! :yum::v:
 
@@ -46,9 +46,30 @@ In fact, Dove is a special library which you can use the single file `dove.php`,
 
 The `.dove` directory can be in a public path with a directory listing feature if it does support by the web server, but you can also put it in a private location and DNFS will be the only access point to those data.
 
+**REST API Pull Request**
+
+![rest-api-pull-request](images/rest-api-pull-request.png)
+
+That was a list of times, in descending order from the newest to the old. So, by selecting a time you can ask for the latest messages after that time, or read the message contents.
+
+**REST API Pull Request After Some Time**
+
+![rest-api-pull-request](images/rest-api-pull-request-after-time.png)
+
+**REST API Pull Request After Last Time**
+
+![rest-api-pull-request](images/rest-api-pull-request-after-last-time.png)
+
+**REST API Read Request**
+
+![rest-api-pull-request](images/rest-api-read-request.png)
+
+DNFS tries to implement zero-trust by making a clear border between inside and outside, so it always encodes times automatically, and the key used to encode/decode will be changed automatically, according to `dove.php` contents and location.
+So, if the client got some time references then the `dove.php` contents got updated somehow or the file location changed, then the old references will not work unless the client asks for new references, and then the client can get the rest of the messages with updated references.
+
 ### :office: Requirements
 
-- PHP 7.3+ (older versions will be supported one by one in the future).
+- PHP 7.3+ (older versions will be supported one by one in the future if applicable).
 
 ### :anchor: Installation & Usage
 Dove project will do its best to be compatible with all its released versions, so in future development releases, there will be no any breaking changes.
@@ -103,6 +124,14 @@ $message = $dove->Read($time); # `$time` act like id
 Then, to handle client requests only include this in path of `$_REQUEST` and it will handling the requests automatically.
 ```php
 <?php require_once 'vendor/vzool/dove.php/dove.php'; ?>
+
+# OR
+
+<?php
+    define('DOVE', 1);
+    require_once 'vendor/vzool/dove.php/dove.php';
+    Dove::Serve();
+?>
 ```
 
 #### :earth_africa: HTTP REST API (Client-Side) [GET/POST/ANY]
@@ -125,28 +154,28 @@ Then, to handle client requests only include this in path of `$_REQUEST` and it 
 - OS: masOS Ventura 13.1
 ```shell
 ====================================================
-Dove Benchmarking started at: 2023-01-29 12:33:34
+Dove Benchmarking started at: 2023-01-30 07:15:31
 ====================================================
 Write messages for 30 sec...
-Write finished on: 2023-01-29 12:34:05
+Write finished on: 2023-01-30 07:16:02
 ----------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-29 12:34:09
+Read finished on: 2023-01-30 07:16:07
 ----------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-29 12:34:28
+Delete finished on: 2023-01-30 07:16:26
 ====================================================
-Write Count 173,106 (msg) in 30 sec
-Write Speed 5,770 (msg/sec).
+Write Count 164,681 (msg) in 30 sec
+Write Speed 5,489 (msg/sec).
 ----------------------------------------------------
-Read Count 173,106 (msg) in 4 sec
-Read Speed 43,277 (msg/sec).
+Read Count 164,681 (msg) in 5 sec
+Read Speed 32,936 (msg/sec).
 ----------------------------------------------------
-Delete Count 173,106 (msg) in 19 sec
-Delete Speed 9,111 (msg/sec).
+Delete Count 164,681 (msg) in 19 sec
+Delete Speed 8,667 (msg/sec).
 ----------------------------------------------------
-Average Count 519,318 (msg).
-Average Speed 58,158 (msg/sec).
+Average Count 494,043 (msg).
+Average Speed 47,093 (msg/sec).
 ====================================================
 ```
 
