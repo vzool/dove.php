@@ -71,6 +71,7 @@ Cryptography is only limited as an option to message integrity while transfer on
 | Signature Encoding   | base64        |   Yes |
 | Times Encyption   | Xsals20 + Poly1305        |   **No** |
 | Times Encoding   | base64url         |    **No** |
+
 ** (By default, but it can be changed by the developer).
 
 ### :sparkles: Motivation
@@ -130,7 +131,7 @@ In a normal situation, and while messages are in transmission the `dove.php` fil
 
 ### :office: Requirements
 
-- PHP 7.3+ (older versions will be supported one by one in the future if applicable).
+- PHP 7.3+
 
 ### :anchor: Installation & Usage
 Dove project will do its best to be compatible with all its released versions, so in future development releases, there will be no breaking changes.
