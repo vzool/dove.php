@@ -17,7 +17,7 @@ class Dove{
     private static $key = []; // $length => $key
     public function __construct(string $client, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_DISABLED, string $hash_function = 'sha1', string $path = __DIR__ . '/.dove/'){
         $this->client = empty($hash_function) ? strtolower($client) : $hash_function(strtolower($client));
-        $this->expiration = $expiration_in_days*24*60*60*1000_000_000; // [1 days -> 86_400 sec] => [1 sec -> 1_000_000_000 ns]
+        $this->expiration = $expiration_in_days*24*60*60*1000000000; // [1 days -> 86_400 sec] => [1 sec -> 1_000_000_000 ns]
         $this->integrity = $integrity;
         $this->path = $path . $this->client . '/';
         if(!file_exists($this->path)) mkdir($this->path, 0777, true);
@@ -102,7 +102,7 @@ class Dove{
                 $time = isset($_REQUEST['time']) ? $_REQUEST['time'] : 0;
                 $dove = new static($client, $expiration_in_days, $integrity, $hash_function, $path);
                 $result = $cmd == 'pull' ? array('status' => 'OK', 'data' => $dove->Pull($time)) : $dove->Read($time);
-                $result['msec'] = (hrtime(true) - DOVE_STARTED) / 1_000_000;
+                $result['msec'] = (hrtime(true) - DOVE_STARTED) / 1000000;
                 die(json_encode($result));
             }
             die('{"status":"error", "message": "not found"}');
