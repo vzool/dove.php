@@ -63,14 +63,14 @@ Dove::Serve(
 
 Cryptography is only limited as an option to message integrity while transfer only, `Dove` deliver the messages as it is, without any encoding or encryption of the message contents.
 
-| Function      | Cipher |  Optional |
-| ----------- | ----------- | -----------  |
-| Client Reference      | SHA-1**      | Yes  |
-| Message Hash   | SHA-256        |  Yes   |
-| Message Signature   | Ed25519        | Yes |
-| Signature Encoding   | base64        |   Yes |
-| Times Encyption   | Xsals20 + Poly1305        |   **No** |
-| Times Encoding   | base64url         |    **No** |
+| Function      | Cipher |  Optional | Changeable   |
+| ----------- | ----------- | -----------  | -----------    |
+| Client Reference      | SHA-1**      | Yes  | Yes |
+| Message Hash   | SHA-256        |  Yes   |   **No** |
+| Message Signature   | Ed25519        | Yes |   **No** |
+| Signature Encoding   | base64        |   Yes |   **No** |
+| Times Encyption   | Xsals20 + Poly1305        |   **No** |   **No** |
+| Times Encoding   | base64url         |    **No** |   **No** |
 
 ** (By default, but it can be changed by the developer).
 
