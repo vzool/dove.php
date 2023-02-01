@@ -27,7 +27,7 @@
 $dove = new Dove(
     string $client, # عنوان العميل المستخدم للإشارة
     int $expiration_in_days = 0, # معطل افتراضيًا ، قم بالتخزين إلى الأبد دون إزالة أي ملف
-    int $integrity = Dove::INTEGRITY_DISABLED, # مستوى سلامة الرسائل
+    int $integrity = Dove::INTEGRITY_ALL, # مستوى سلامة الرسائل
     string $hash_function = 'sha1', # وظيفة تجزئة مدمجة أو أي وظيفة مجهولة تعمل مثل `sha1()`.
     string $path = __DIR__ . '/.dove/'
 );
@@ -73,16 +73,38 @@ class Dove{
 </div>
 
 <div dir="rtl">
-لبدء الخادم ، يتصرف بشكل مشابه للمنشئ (constructor):
+
+لبدء عمل الخادم، يمكن استخدام واجهة مختلفة مشابهة لواجهة المنشئ (`constructor`):
 </div>
 
 ```php
 Dove::Serve(
     true, # منع إكمال تنفيذ البرمجة بعد النداء
     int $expiration_in_days = 0, # معطل افتراضيًا ، قم بالتخزين إلى الأبد دون إزالة أي ملف
-    int $integrity = Dove::INTEGRITY_DISABLED, # مستوى سلامة الرسائل
+    int $integrity = Dove::INTEGRITY_ALL, # مستوى سلامة الرسائل
     string $hash_function = 'sha1', # وظيفة تجزئة مدمجة أو أي وظيفة مجهولة تعمل مثل `sha1()`.
     string $path = __DIR__ . '/.dove/'
+);
+```
+
+<div dir="rtl">
+
+بالنسبة إلى معلمة التكامل `integrity` ، فهي متغير أحادي `bitwise` يمكنك الجمع بين خيارات متعددة في وقت واحد مثل ما يلي:
+</div>
+
+```php
+$dove = new Dove(
+    # ..
+    Dove::INTEGRITY_GENERATE_HASH | Dove::INTEGRITY_GENERATE_SIGNATURE, # توليد كل شيء دون التحقق
+    # ..
+);
+
+# وكذلك
+
+Dove::Serve(
+    # ..
+    Dove::INTEGRITY_GENERATE_HASH | Dove::INTEGRITY_GENERATE_SIGNATURE, # توليد كل شيء دون التحقق
+    # ..
 );
 ```
 
@@ -210,13 +232,13 @@ define('DOVE', 1);
 require_once 'dove.php';
 
 $dove = new Dove('abdelaziz');
-$time = $dove->Push('Salam, World!');
-$message = $dove->Read($time); # قراءة رسالة في توقيت محدد
+$result = $dove->Push('Salam, World!');
+$message = $dove->Read($result['time']); # قراءة رسالة في توقيت محدد
 
-$times = $dove->Pull($time); # سحب كل مواقيت الرسائل بعد توقيت محدد
+$times = $dove->Pull($result['time']); # سحب كل مواقيت الرسائل بعد توقيت محدد
 $times = $dove->Pull(); # سحب كل مواقيت الرسائل
 
-$dove->Delete($time); # حذف رسالة واحدة فقط
+$dove->Delete($result['time']); # حذف رسالة واحدة فقط
 $dove->Delete(); # حذف كل الرسائل
 ?>
 ```
@@ -246,8 +268,8 @@ define('DOVE', 1);
 require_once 'vendor/vzool/dove.php/dove.php';
 
 $dove = new Dove('abdelaziz');
-$time = $dove->Push('Salam, World!');
-$message = $dove->Read($time); # قراءة رسالة في توقيت محدد
+$result = $dove->Push('Salam, World!');
+$message = $dove->Read($result['time']); # قراءة رسالة في توقيت محدد
 # ...
 ?>
 ```
@@ -301,243 +323,243 @@ $message = $dove->Read($time); # قراءة رسالة في توقيت محدد
 INTEGRITY_TYPE = Dove::INTEGRITY_DISABLED
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:17:06
+Dove Benchmarking started at: 2023-02-01 09:38:40
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:17:37
+Write finished on: 2023-02-01 09:39:11
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:17:51
+Read finished on: 2023-02-01 09:39:18
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:18:19
+Delete finished on: 2023-02-01 09:39:48
 ==========================================================================
-Write Count 123,574 (msg) in (00:00:30)
-Write Speed 4,119 (msg/sec).
+Write Count 91,961 (msg) in (00:00:30)
+Write Speed 3,065 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 123,574 (msg) in (00:00:14)
-Read Speed 8,827 (msg/sec).
+Read Count 91,961 (msg) in (00:00:07)
+Read Speed 13,137 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 123,574 (msg) in (00:00:28)
-Delete Speed 4,413 (msg/sec).
+Delete Count 91,961 (msg) in (00:00:30)
+Delete Speed 3,065 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 370,722 (msg).
-Average Speed 17,359 (msg/sec).
+Average Count 275,883 (msg).
+Average Speed 19,268 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:18:19) and took (00:01:12)
+Dove Benchmarking done at: (2023-02-01 09:39:48) and took (00:01:07)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_GENERATE_HASH
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:18:19
+Dove Benchmarking started at: 2023-02-01 09:39:48
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:18:50
+Write finished on: 2023-02-01 09:40:19
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:19:07
+Read finished on: 2023-02-01 09:40:23
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:19:35
+Delete finished on: 2023-02-01 09:40:47
 ==========================================================================
-Write Count 90,512 (msg) in (00:00:30)
-Write Speed 3,017 (msg/sec).
+Write Count 50,089 (msg) in (00:00:30)
+Write Speed 1,670 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 90,512 (msg) in (00:00:17)
-Read Speed 5,324 (msg/sec).
+Read Count 50,089 (msg) in (00:00:04)
+Read Speed 12,522 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 90,512 (msg) in (00:00:28)
-Delete Speed 3,233 (msg/sec).
+Delete Count 50,089 (msg) in (00:00:24)
+Delete Speed 2,087 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 271,536 (msg).
-Average Speed 11,574 (msg/sec).
+Average Count 150,267 (msg).
+Average Speed 16,279 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:19:35) and took (00:01:15)
+Dove Benchmarking done at: (2023-02-01 09:40:47) and took (00:00:58)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_VERIFY_HASH
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:19:35
+Dove Benchmarking started at: 2023-02-01 09:40:47
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:20:06
+Write finished on: 2023-02-01 09:41:18
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:20:23
+Read finished on: 2023-02-01 09:41:24
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:20:55
+Delete finished on: 2023-02-01 09:41:56
 ==========================================================================
-Write Count 133,436 (msg) in (00:00:30)
-Write Speed 4,448 (msg/sec).
+Write Count 90,398 (msg) in (00:00:30)
+Write Speed 3,013 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 133,436 (msg) in (00:00:17)
-Read Speed 7,849 (msg/sec).
+Read Count 90,398 (msg) in (00:00:06)
+Read Speed 15,066 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 133,436 (msg) in (00:00:32)
-Delete Speed 4,170 (msg/sec).
+Delete Count 90,398 (msg) in (00:00:32)
+Delete Speed 2,825 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 400,308 (msg).
-Average Speed 16,467 (msg/sec).
+Average Count 271,194 (msg).
+Average Speed 20,905 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:20:55) and took (00:01:19)
+Dove Benchmarking done at: (2023-02-01 09:41:56) and took (00:01:08)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_GENERATE_HASH | Dove::INTEGRITY_VERIFY_HASH
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:20:55
+Dove Benchmarking started at: 2023-02-01 09:41:56
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:21:26
+Write finished on: 2023-02-01 09:42:27
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:21:35
+Read finished on: 2023-02-01 09:42:32
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:22:02
+Delete finished on: 2023-02-01 09:42:57
 ==========================================================================
-Write Count 84,705 (msg) in (00:00:30)
-Write Speed 2,824 (msg/sec).
+Write Count 54,695 (msg) in (00:00:30)
+Write Speed 1,823 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 84,705 (msg) in (00:00:09)
-Read Speed 9,412 (msg/sec).
+Read Count 54,695 (msg) in (00:00:05)
+Read Speed 10,939 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 84,705 (msg) in (00:00:27)
-Delete Speed 3,137 (msg/sec).
+Delete Count 54,695 (msg) in (00:00:25)
+Delete Speed 2,188 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 254,115 (msg).
-Average Speed 15,372 (msg/sec).
+Average Count 164,085 (msg).
+Average Speed 14,950 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:22:02) and took (00:01:06)
+Dove Benchmarking done at: (2023-02-01 09:42:57) and took (00:01:00)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_GENERATE_SIGNATURE
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:22:02
+Dove Benchmarking started at: 2023-02-01 09:42:57
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:22:33
+Write finished on: 2023-02-01 09:43:28
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:22:39
+Read finished on: 2023-02-01 09:43:32
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:23:05
+Delete finished on: 2023-02-01 09:43:55
 ==========================================================================
-Write Count 79,720 (msg) in (00:00:30)
-Write Speed 2,657 (msg/sec).
+Write Count 48,342 (msg) in (00:00:30)
+Write Speed 1,611 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 79,720 (msg) in (00:00:06)
-Read Speed 13,287 (msg/sec).
+Read Count 48,342 (msg) in (00:00:04)
+Read Speed 12,086 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 79,720 (msg) in (00:00:26)
-Delete Speed 3,066 (msg/sec).
+Delete Count 48,342 (msg) in (00:00:23)
+Delete Speed 2,102 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 239,160 (msg).
-Average Speed 19,010 (msg/sec).
+Average Count 145,026 (msg).
+Average Speed 15,799 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:23:05) and took (00:01:02)
+Dove Benchmarking done at: (2023-02-01 09:43:55) and took (00:00:57)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_VERIFY_SIGNATURE
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:23:05
+Dove Benchmarking started at: 2023-02-01 09:43:55
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:23:36
+Write finished on: 2023-02-01 09:44:26
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:23:51
+Read finished on: 2023-02-01 09:44:34
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:24:23
+Delete finished on: 2023-02-01 09:45:03
 ==========================================================================
-Write Count 132,959 (msg) in (00:00:30)
-Write Speed 4,432 (msg/sec).
+Write Count 78,122 (msg) in (00:00:30)
+Write Speed 2,604 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 132,959 (msg) in (00:00:15)
-Read Speed 8,864 (msg/sec).
+Read Count 78,122 (msg) in (00:00:08)
+Read Speed 9,765 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 132,959 (msg) in (00:00:32)
-Delete Speed 4,155 (msg/sec).
+Delete Count 78,122 (msg) in (00:00:29)
+Delete Speed 2,694 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 398,877 (msg).
-Average Speed 17,451 (msg/sec).
+Average Count 234,366 (msg).
+Average Speed 15,063 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:24:23) and took (00:01:17)
+Dove Benchmarking done at: (2023-02-01 09:45:03) and took (00:01:07)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_GENERATE_SIGNATURE | Dove::INTEGRITY_VERIFY_SIGNATURE
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:24:23
+Dove Benchmarking started at: 2023-02-01 09:45:03
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:24:54
+Write finished on: 2023-02-01 09:45:34
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:25:05
+Read finished on: 2023-02-01 09:45:42
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:25:32
+Delete finished on: 2023-02-01 09:46:08
 ==========================================================================
-Write Count 81,489 (msg) in (00:00:30)
-Write Speed 2,716 (msg/sec).
+Write Count 50,710 (msg) in (00:00:30)
+Write Speed 1,690 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 81,489 (msg) in (00:00:11)
-Read Speed 7,408 (msg/sec).
+Read Count 50,710 (msg) in (00:00:08)
+Read Speed 6,339 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 81,489 (msg) in (00:00:27)
-Delete Speed 3,018 (msg/sec).
+Delete Count 50,710 (msg) in (00:00:26)
+Delete Speed 1,950 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 244,467 (msg).
-Average Speed 13,143 (msg/sec).
+Average Count 152,130 (msg).
+Average Speed 9,979 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:25:32) and took (00:01:08)
+Dove Benchmarking done at: (2023-02-01 09:46:08) and took (00:01:04)
 ==========================================================================
 
 
 INTEGRITY_TYPE = Dove::INTEGRITY_ALL
 
 ==========================================================================
-Dove Benchmarking started at: 2023-01-31 12:25:32
+Dove Benchmarking started at: 2023-02-01 09:46:08
 ==========================================================================
 Write messages for (00:00:30) ...
-Write finished on: 2023-01-31 12:26:03
+Write finished on: 2023-02-01 09:46:39
 --------------------------------------------------------------------------
 Read all written messages...
-Read finished on: 2023-01-31 12:26:13
+Read finished on: 2023-02-01 09:46:45
 --------------------------------------------------------------------------
 Delete all written messages...
-Delete finished on: 2023-01-31 12:26:37
+Delete finished on: 2023-02-01 09:47:09
 ==========================================================================
-Write Count 63,099 (msg) in (00:00:30)
-Write Speed 2,103 (msg/sec).
+Write Count 40,413 (msg) in (00:00:30)
+Write Speed 1,347 (msg/sec).
 --------------------------------------------------------------------------
-Read Count 63,099 (msg) in (00:00:10)
-Read Speed 6,310 (msg/sec).
+Read Count 40,413 (msg) in (00:00:06)
+Read Speed 6,736 (msg/sec).
 --------------------------------------------------------------------------
-Delete Count 63,099 (msg) in (00:00:24)
-Delete Speed 2,629 (msg/sec).
+Delete Count 40,413 (msg) in (00:00:24)
+Delete Speed 1,684 (msg/sec).
 --------------------------------------------------------------------------
-Average Count 189,297 (msg).
-Average Speed 11,042 (msg/sec).
+Average Count 121,239 (msg).
+Average Speed 9,766 (msg/sec).
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:26:37) and took (00:01:04)
+Dove Benchmarking done at: (2023-02-01 09:47:09) and took (00:01:00)
 ==========================================================================
 ==========================================================================
-Dove Benchmarking done at: (2023-01-31 12:26:37) and all took (00:09:23)
+Dove Benchmarking done at: (2023-02-01 09:47:09) and all took (00:08:21)
 ==========================================================================
 ```
 <div dir="rtl">

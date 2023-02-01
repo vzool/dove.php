@@ -4,12 +4,12 @@ define('DOVE', 1);
 require_once 'dove.php';
 
 $dove = new Dove('abdelaziz');
-$time = $dove->Push('Salam, World!');
-$message = $dove->Read($time); # `$time` act like id
+$result = $dove->Push('Salam, World!');
+$message = $dove->Read($result['time']); # time act like id
 
-$times = $dove->Pull($time); # all times of messages after `$time`
+$times = $dove->Pull($result['time']); # all times of messages after `$time`
 $times = $dove->Pull(); # all times of messages
 
-$dove->Delete($time); # delete one message
+$dove->Delete($result['time']); # delete one message
 $dove->Delete(); # delete all messages
 ?>
