@@ -97,7 +97,7 @@ class Dove{
         if($_REQUEST || isset($_SERVER['HTTP_HOST']) || $block){
             $start = hrtime(true);
             header('Content-Type: application/json');
-            $client = isset($_REQUEST['client']) ? $_REQUEST['client'] : die('{"status":"error", "message": "client not sent"}');
+            $client = isset($_REQUEST['client']) ? $_REQUEST['client'] : die('{"status":"ERROR", "message": "client not sent"}');
             if(!empty($client)){
                 $cmd = isset($_REQUEST['cmd']) ? strtolower($_REQUEST['cmd']) : 'pull';
                 $time = isset($_REQUEST['time']) ? $_REQUEST['time'] : 0;
@@ -106,7 +106,7 @@ class Dove{
                 $result['msec'] = (hrtime(true) - $start) / 1000000; // 1_000_000
                 die(json_encode($result));
             }
-            die('{"status":"error", "message": "not found"}');
+            die('{"status":"ERROR", "message": "not found"}');
         }
     }
     /* ----------- */
