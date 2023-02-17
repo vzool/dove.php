@@ -11,14 +11,15 @@ class Dove{
     const INTEGRITY_ALL = 0b1111; // or 1
     private $path = '';
     private $client = '';
-    private $expiration = 0;  // days
+    private $expiration = 0; // days
     private $integrity = Dove::INTEGRITY_ALL;
-    private static $key = []; // $length => $key
-    public function __construct(string $client, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $hash_function = 'sha1', string $path = __DIR__ . '/.dove/'){
-        $this->client = empty($hash_function) ? strtolower($client) : $hash_function(strtolower($client));
+    private static $key = []; // $length => $key or $type => $key
+    public function __construct(string $client, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $path = __DIR__ . '/') {
+        static::key($path = empty($path) ? __DIR__ . '/' : $path);
+        $this->client = sodium_bin2hex(sodium_crypto_generichash(strtolower($client), static::$key[32]));
         $this->expiration = $expiration_in_days*24*60*60*1000000000; // [1 days -> 86_400 sec] => [1 sec -> 1_000_000_000 ns]
         $this->integrity = $integrity;
-        $this->path = $path . $this->client . '/';
+        $this->path = static::path($path) . $this->client . '/';
         if(!file_exists($this->path)) mkdir($this->path, 0777, true);
     }
     public function Push(string $message) : array {
@@ -28,7 +29,7 @@ class Dove{
         file_put_contents($this->path . $time . '/' . 'data', $message);
         $result = array('time' => static::encode($time), 'sha256' => '', 'signature' => '');
         if($this->integrity & Dove::INTEGRITY_GENERATE_HASH) { $result['sha256'] = hash('sha256', $message); file_put_contents($this->path . $time . '/sha256', $result['sha256']); }
-        if($this->integrity & Dove::INTEGRITY_GENERATE_SIGNATURE){ static::key(); $result['signature'] = base64_encode(sodium_crypto_sign_detached($message, sodium_crypto_sign_secretkey(static::$key['keypair']))); file_put_contents($this->path . $time . '/signature', $result['signature']); }
+        if($this->integrity & Dove::INTEGRITY_GENERATE_SIGNATURE){ $result['signature'] = base64_encode(sodium_crypto_sign_detached($message, sodium_crypto_sign_secretkey(static::$key['keypair']))); file_put_contents($this->path . $time . '/signature', $result['signature']); }
         return $result;
     }
     public function Pull(string $time = '', bool $debug = false) : array {
@@ -46,7 +47,7 @@ class Dove{
         if(empty($time)) return array_map(function($value){ return static::encode($value); }, $messages);
         return array_map(function($value){ return static::encode($value); }, array_filter($messages, function($value) use ($time) { return $value > static::decode($time); }));
     }
-    public function Read(string $time) : array { static::key();
+    public function Read(string $time) : array {
         $time = static::decode($time);
         $hash = @file_get_contents($this->path . $time . '/sha256');
         $signature = @file_get_contents($this->path . $time . '/signature');
@@ -54,7 +55,7 @@ class Dove{
         return array(
             'status' => empty($data) ? 'MISSING' : 'OK',
             'sha256' => $hash,
-            'signature' => $signature,
+            'signature' => $signature, 'public' => Dove::key(),
             'time' => $time,
             'data' => $data,
             'integrity' => array(
@@ -71,16 +72,20 @@ class Dove{
         rmdir($this->path);
         return true;
     }
-    public static function key() : void {
+    private static function path(string $path = __DIR__ . '/') : string { return "$path/.dove/"; }
+    private static function nuke(string $path = __DIR__ . '/') : void { system("rm -rf -- " . escapeshellarg(static::path($path))); mkdir(static::path($path), 0777, true); }
+    public static function key(string $path = __DIR__ . '/') : string {
         if(empty(static::$key)) {
             $file = file_get_contents(__FILE__);
             $id = strrev(hash('sha512', __FILE__) . hash('sha512', $file) . hash('sha512', json_encode(stat(__FILE__)) . __LINE__));
             static::$key = [
+                'fingerprint' => sodium_bin2hex(sodium_crypto_generichash($id . $file)), // fingerprint
                 24 => substr(hash('sha512', $id . self::class . __FILE__ . $file), 0, 24), // nonce
                 32 => substr(hash('sha512', strrev($file . __FILE__ . self::class . $id)), 0, 32), // symmetric key
                 'keypair' => sodium_crypto_sign_seed_keypair(substr($id, 0, 32)), // Ed25519 keypair
-            ];
-        }
+            ]; static::$key['public'] = sodium_crypto_sign_publickey(static::$key['keypair']); // Ed25519 public key
+            if(!file_exists(static::path($path) . static::$key['fingerprint'])) { static::nuke(); touch(static::path($path) . static::$key['fingerprint']); }
+        } return sodium_bin2hex(static::$key['public']);
     }
     public static function base64url_encode($data) : string { return rtrim(strtr(base64_encode($data), '+/', '-_'), '='); }
     public static function base64url_decode($data) : string { return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '=', STR_PAD_RIGHT)); }
@@ -93,7 +98,7 @@ class Dove{
     /* ------------------- */
     /* -- HTTP REST API -- */
     /* ------------------- */
-    public static function Serve(bool $block = true, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $hash_function = 'sha1', string $path = __DIR__ . '/.dove/') : void {
+    public static function Serve(bool $block = true, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $path = __DIR__ . '/') : void {
         if($_REQUEST || isset($_SERVER['HTTP_HOST']) || $block){
             $start = hrtime(true);
             header('Content-Type: application/json');
@@ -101,7 +106,7 @@ class Dove{
             if(!empty($client)){
                 $cmd = isset($_REQUEST['cmd']) ? strtolower($_REQUEST['cmd']) : 'pull';
                 $time = isset($_REQUEST['time']) ? $_REQUEST['time'] : 0;
-                $dove = new static($client, $expiration_in_days, $integrity, $hash_function, $path);
+                $dove = new static($client, $expiration_in_days, $integrity, $path);
                 $result = $cmd == 'pull' ? array('status' => 'OK', 'data' => $dove->Pull($time)) : $dove->Read($time);
                 $result['msec'] = (hrtime(true) - $start) / 1000000; // 1_000_000
                 die(json_encode($result));
@@ -138,6 +143,7 @@ class Dove{
             static::debug('time should not be empty', !empty($value['time']), __LINE__);
             static::debug('sha256 should not be empty', !empty($value['sha256']), __LINE__);
             static::debug('signature should not be empty', !empty($value['signature']), __LINE__);
+            static::debug('public should not be empty', !empty($value['public']), __LINE__);
             static::debug('integrity.sha256 should be true', $value['integrity']['sha256'], __LINE__);
             static::debug('integrity.integrity should be true', $value['integrity']['signature'], __LINE__);
             $current = sizeof($dove->Pull($times[$i], true));
@@ -152,6 +158,7 @@ class Dove{
             static::debug('status should equal MISSING', $value['status'] === 'MISSING', __LINE__);
             static::debug('sha256 should be false', $value['sha256'] === false, __LINE__);
             static::debug('signature should be false', $value['signature'] === false, __LINE__);
+            static::debug('public should not be empty', !empty($value['public']), __LINE__);
         }
         $dove->Delete();
         die('OK');

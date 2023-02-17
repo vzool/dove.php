@@ -19,8 +19,7 @@ $dove = new Dove(
     string $client, # client address used to reference.
     int $expiration_in_days = 0, # disabled by default, store forever without removing any.
     int $integrity = Dove::INTEGRITY_ALL, # level of integrity of the messages.
-    string $hash_function = 'sha1', # built-in hash function or any anonymous function act like `sha1()`.
-    string $path = __DIR__ . '/.dove/'
+    string $path = __DIR__ . '/'
 );
 ```
 
@@ -54,8 +53,7 @@ Dove::Serve(
     true, # Block the execution.
     int $expiration_in_days = 0, # disabled by default, store forever without removing any.
     int $integrity = Dove::INTEGRITY_ALL, # level of integrity of the messages.
-    string $hash_function = 'sha1', # built-in hash function or any anonymous function act like `sha1()`.
-    string $path = __DIR__ . '/.dove/'
+    string $path = __DIR__ . '/'
 );
 ```
 
@@ -83,14 +81,14 @@ Cryptography is only limited as an option to message integrity while transfer on
 
 | Function      | Cipher |  Optional | Changeable   |
 | ----------- | ----------- | -----------  | -----------    |
-| Client Reference      | SHA-1**      | Yes  | Yes |
+| Client Reference      | BLAKE2b      | **No**  | **No** |
 | Message Hash   | SHA-256        |  Yes   |   **No** |
 | Message Signature   | Ed25519        | Yes |   **No** |
 | Signature Encoding   | base64        |   Yes |   **No** |
 | Times Encyption   | Xsals20 + Poly1305        |   **No** |   **No** |
 | Times Encoding   | base64url         |    **No** |   **No** |
 
-** (By default, but it can be changed by the developer).
+
 
 ### :sparkles: Motivation
 The main idea came from the [Passky-Server](https://github.com/Rabbit-Company/Passky-Server) project chats on the [discord server](https://discord.gg/y2ZBKbW5TA) about what happened to the LastPass data breach, which affects Personally Identifiable Information (PII) and lets a bad actor uses that information to stage a Phishing-Attack.
@@ -133,7 +131,10 @@ That was a list of times, in descending order from the newest to the old. So, by
 
 ![rest-api-pull-request](images/rest-api-read-request.png)
 
-DNFS tries to implement zero-trust by making a clear border between inside and outside, so it always encodes times automatically, and the key used to encode/decode will be changed automatically, according to `dove.php` contents and location.
+DNFS tries to implement zero-trust by making a clear border between inside and outside, so it always encodes times automatically, and the key used to encode/decode will be changed automatically, according to `dove.php` contents, file state and location.
+
+If `dove.php` identity changed then `.dove` entire folder will be deleted automatically.
+
 So, if the client got some time references then the `dove.php` contents got updated somehow or the file location changed, then the old references will not work unless the client asks for new references, and then the client can get the rest of the messages with updated references.
 
 **REST API Read Request with Invalid Signature**

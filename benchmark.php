@@ -27,7 +27,7 @@ foreach([
     
     echo PHP_EOL . PHP_EOL . "INTEGRITY_TYPE = $intgrity_name" . PHP_EOL . PHP_EOL;
     
-    $dove = new Dove('benchmark', 1, $intgrity_value, '');
+    $dove = new Dove('benchmark', 1, $intgrity_value);
     $keyword = 'Salam, World-%d!';
     
     echo $bold_separator . PHP_EOL;
