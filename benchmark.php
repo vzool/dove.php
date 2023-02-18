@@ -6,6 +6,8 @@ require_once 'dove.php';
 
 $total = 0;
 
+$stats = [];
+
 foreach([
     Dove::INTEGRITY_DISABLED => 'Dove::INTEGRITY_DISABLED',
     Dove::INTEGRITY_GENERATE_HASH => 'Dove::INTEGRITY_GENERATE_HASH',
@@ -77,8 +79,28 @@ foreach([
     $delete_duration = $delete_finish - $delete_start;
     $delete_speed = $delete / ($delete_duration);
     
-    $average = number_format($write + $read + $delete);
-    $average_speed = number_format($write_speed + $read_speed + $delete_speed);
+    $average = ($write + $read + $delete) / 3;
+    $average_speed = ($write_speed + $read_speed + $delete_speed) / 3;
+    
+    $total_duration = $write_duration + $read_duration + $delete_duration;
+
+    $total += $total_duration;
+
+    $stats[] = [
+        "id" => hrtime(true),
+        "name" => $intgrity_name,
+        "write_speed" => $write_speed,
+        "write_duration" => $write_duration,
+        "read_speed" => $read_speed,
+        "read_duration" => $read_duration,
+        "delete_speed" => $delete_speed,
+        "delete_duration" => $delete_duration,
+        "average_speed" => $average_speed,
+        "total_duration" => $total_duration,
+    ];
+    
+    $average = number_format($average);
+    $average_speed = number_format($average_speed);
     
     $write = number_format($write);
     $read = number_format($read);
@@ -88,9 +110,6 @@ foreach([
     $read_speed = number_format($read_speed);
     $delete_speed = number_format($delete_speed);
     
-    $total_duration = $write_duration + $read_duration + $delete_duration;
-    $total += $total_duration;
-
     $total_duration = number_format($total_duration);
     
     echo "Write Count $write (msg) in (" . gmdate("H:i:s", $write_duration) . ")" . PHP_EOL;
@@ -112,4 +131,6 @@ foreach([
 echo $bold_separator . PHP_EOL;
 echo "Dove Benchmarking done at: (" . date('Y-m-d H:i:s') . ") and all took (" . gmdate("H:i:s", $total) .")" . PHP_EOL;
 echo $bold_separator . PHP_EOL;
+
+file_put_contents('stats.json', json_encode($stats));
 ?>
