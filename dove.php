@@ -13,17 +13,19 @@ class Dove{
     private $client = '';
     private $expiration = 0; // days
     private $integrity = Dove::INTEGRITY_ALL;
+    private $cmd = '*'; // all commands allowed, otherwise start with a limited constructor without `Push` cmd
     private static $key = []; // $length => $key or $type => $key
-    public function __construct(string $client, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $path = __DIR__ . '/') {
+    public function __construct(string $client, int $expiration_in_days = 0, int $integrity = Dove::INTEGRITY_ALL, string $cmd = '*', string $path = __DIR__ . '/') {
         static::key($path = empty($path) ? __DIR__ . '/' : $path);
         $this->client = sodium_bin2hex(sodium_crypto_generichash(strtolower($client), static::$key[32]));
         $this->expiration = $expiration_in_days*24*60*60*1000000000; // [1 days -> 86_400 sec] => [1 sec -> 1_000_000_000 ns]
         $this->integrity = $integrity;
+        $this->cmd = $cmd;
         $this->path = static::path($path) . $this->client . '/';
-        if(!file_exists($this->path)) mkdir($this->path, 0777, true);
+        if(!file_exists($this->path) && $cmd === '*') mkdir($this->path, 0777, true);
     }
     public function Push(string $message) : array {
-        if(empty($message)) return array();
+        if(empty($message) || $this->cmd !== '*') return array();
         $time = hrtime(true);
         mkdir($this->path . $time, 0777, true);
         file_put_contents($this->path . $time . '/' . 'data', $message);
@@ -33,6 +35,7 @@ class Dove{
         return $result;
     }
     public function Pull(string $time = '', bool $debug = false) : array {
+        if(!is_dir($this->path)) return array();
         $messages = array_diff(scandir($this->path, SCANDIR_SORT_DESCENDING), array('.', '..'));
         if(!empty($this->expiration)){
             $current = hrtime(true);
@@ -106,7 +109,7 @@ class Dove{
             if(!empty($client)){
                 $cmd = isset($_REQUEST['cmd']) ? strtolower($_REQUEST['cmd']) : 'pull';
                 $time = isset($_REQUEST['time']) ? $_REQUEST['time'] : 0;
-                $dove = new static($client, $expiration_in_days, $integrity, $path);
+                $dove = new static($client, $expiration_in_days, $integrity, $cmd, $path);
                 $result = $cmd == 'pull' ? array('status' => 'OK', 'data' => $dove->Pull($time)) : $dove->Read($time);
                 $result['msec'] = (hrtime(true) - $start) / 1000000; // 1_000_000
                 die(json_encode($result));
@@ -152,7 +155,7 @@ class Dove{
         }
         for($i = 0; $i < 10; $i++){
             static::debug('Dove::Delete() function output should not be empty', !empty($dove->Delete($times[$i])), __LINE__);
-            $value = $dove->Read($times[$i]);
+            $value = $dove->Read($times[$i]); $dove->Pull($times[$i]); 
             var_dump(array('value' => $value));
             static::debug('data should be empty', empty($value['data']), __LINE__);
             static::debug('status should equal MISSING', $value['status'] === 'MISSING', __LINE__);
@@ -160,7 +163,7 @@ class Dove{
             static::debug('signature should be false', $value['signature'] === false, __LINE__);
             static::debug('public should not be empty', !empty($value['public']), __LINE__);
         }
-        $dove->Delete();
+        $dove->Delete(); $dove->Pull(); 
         die('OK');
     }
 }
